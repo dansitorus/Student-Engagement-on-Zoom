@@ -1,0 +1,14 @@
+-- Modify the data type of TimeFrom and TimeTo columns in the vtt table
+-- to TIME(3) to support milliseconds precision.
+ALTER TABLE vtt
+MODIFY TimeFrom TIME(3),
+MODIFY TimeTo TIME(3);
+
+-- Create a new table named vttclean by duplicating all the columns from the vtt table
+-- and adding a new column named 'milliseconds'.
+-- The 'milliseconds' column is calculated by finding the difference between TimeTo and TimeFrom
+-- in microseconds, then converting this value to milliseconds.
+CREATE TABLE vttclean AS
+SELECT vtt.*,
+       TIMESTAMPDIFF(MICROSECOND, TimeFrom, TimeTo) / 1000 AS milliseconds
+FROM vtt;
