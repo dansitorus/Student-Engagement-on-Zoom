@@ -33,4 +33,24 @@ Employ the to_sql method to write the structured DataFrame to a new table in the
 
 ![Screenshot 2024-09-13 022807](https://github.com/user-attachments/assets/d2b68a33-bede-4dba-be2e-f1616cb1138d)
 
+# SQL Data Preparation for Student Engagement Analysis
+To facilitate the evaluation of student engagement data, the original vtt table was cloned into a new table called vttclean. The data types of the timefrom and timeto columns were refined to TIME(3) to accurately capture time in milliseconds. Following this adjustment, the duration between timefrom and timeto for each record was computed, with the results converted from microseconds to milliseconds. This calculated duration was then stored in a newly added column within the vttclean table. These modifications provided a precise and well-prepared dataset, setting a robust groundwork for subsequent analysis of student participation.
+
+# Data Visualization for Student Engagement Using R
+R was chosen for this analysis due to its powerful data manipulation and visualization capabilities. Libraries such as RMySQL, dplyr, forcats, and ggplot2 were utilized to facilitate a seamless connection to the MySQL database, process the data, and generate effective visual representations.
+
+The process began with establishing a connection to the anl503 database and importing the vttclean table into a data frame. The next step involved calculating the total speaking time for each student by aggregating the milliseconds column. Entries where the RegName was 'INSTRUCTOR' or absent were excluded to focus on student data.
+
+To enhance readability, the data was organized in descending order of total airtime using the fct_reorder function from the forcats package. The final visualization was crafted using ggplot2, producing a bar chart that distinctly showcases the accumulated speaking time for each student. This visual aid effectively highlights differences in student engagement levels, allowing for easy comparison and analysis.
+
+![Screenshot 2024-09-13 023027](https://github.com/user-attachments/assets/ee48ccde-2a9f-4716-a61a-47290d8971e6)
+
+
+
+
+
+
+
+
+
 
