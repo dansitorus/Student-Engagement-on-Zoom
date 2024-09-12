@@ -1,0 +1,50 @@
+import re
+import pandas as pd
+import pymysql
+from sqlalchemy import create_engine
+INIT_regex = re.compile(r'^WEBVTT\s*$')
+SNo_regex = re.compile(r'^(\d+)\s*$')
+Time_regex= re.compile(r'^(\d{2}:\d{2}:\d{2}\.\d{3}) --> (\d{2}:\d{2}:\d{2}\.\d{3})\s*$')
+NameUtt_regex = re.compile(r'^([^:]+):\s?(.*)$')
+UttOnly_regex = re.compile(r'^([^:]+)$')
+vttpath = 'captured_dialogue.vtt'
+vtt = open(vttpath)
+all_lines = vtt.readlines()
+vtt.close()
+colnames = ['SNo','TimeFrom','TimeTo','RegName','Utterance']
+df = pd.DataFrame(columns=colnames)
+lookingFor = 'INIT'
+for i, current_line in enumerate(all_lines):
+    if lookingFor == 'INIT':
+        mo = INIT_regex.search(current_line)
+        if mo != None:
+            lookingFor = 'SNo'
+    elif lookingFor == 'SNo':
+        mo = SNo_regex.match(current_line) #match the current line to find no. 
+        if mo:
+            sno = mo.group(1)              # extracting 
+            lookingFor = 'Time'
+    elif lookingFor == 'Time':             #finding time next
+        mo = Time_regex.match(current_line)
+        if mo:
+            time_from, time_to = mo.groups()  # extracting
+            lookingFor = 'NameUtt'            # looking for name and utternace
+    elif lookingFor == 'NameUtt':
+        mo = NameUtt_regex.match(current_line)
+        if mo:
+            reg_name = mo.group(1) if mo.group(1).strip() else "NA" # extract name and utterance and change it to NA if it is not found
+            utterance = mo.group(2)
+            df.loc[len(df)] = [sno, time_from, time_to, reg_name, utterance] # add a new row to df
+            lookingFor = 'SNo'
+        else:
+            reg_name = "NA"         # If not match,  whole line as utter 
+            utterance = current_line.strip()  
+            df.loc[len(df)] = [sno, time_from, time_to, reg_name, utterance] #add a new row with the cuttent info
+            lookingFor = 'SNo'
+df.reset_index(drop=True, inplace=True)
+username = 'root'
+password = ''
+hostname = 'localhost'
+database_name = ''
+engine = create_engine(f'mysql+pymysql://{username}:{password}@{hostname}/{database_name}')
+df.to_sql('vtt', con=engine, index=False, if_exists='replace')
