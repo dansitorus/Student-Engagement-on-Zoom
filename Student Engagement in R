@@ -1,0 +1,27 @@
+library(package=RMySQL)
+library(dplyr)
+library(ggplot2)
+library(scales)
+con = dbConnect(drv=MySQL(),dbname="ANL 503", user="root", password="G0626286x!")
+d = suppressWarnings(expr=dbReadTable(conn=con, name="vttclean"))
+dbDisconnect(conn=con)
+
+# extracting student, summing and filtering
+student_airtime <- d %>% 
+  filter(grepl("^STUDENT", RegName)) %>%
+  group_by(RegName) %>%
+  summarise(Totalmilliseconds = sum(milliseconds)) 
+
+#Plotting
+ggplot(student_airtime, aes(x=reorder(RegName, -Totalmilliseconds), y=Totalmilliseconds, fill=Totalmilliseconds)) +
+  geom_bar(stat="identity") +
+  scale_fill_gradient(low="burlywood", high="saddlebrown") +  
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Total Airtime by Student in Descending Order",
+       x = "Student",
+       y = "Total Airtime (milliseconds)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 40, hjust = 1),
+        panel.grid.major = element_blank(),  # Getting rid of the grid lines
+        panel.grid.minor = element_blank(),
+        legend.position = "none")           # No legend
