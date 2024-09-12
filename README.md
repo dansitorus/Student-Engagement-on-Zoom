@@ -1,1 +1,4 @@
 ## Student-Engagement-on-Zoom
+Project Overview
+In the realm of online education, student engagement is essential, especially as universities increasingly rely on virtual platforms like Zoom for instruction. To gauge and boost student involvement, many courses integrate a class participation score into the overall assessment. However, quantifying each student's engagement through their virtual interactions presents challenges.
+This project seeks to tackle these challenges by leveraging auto-generated transcripts from Zoom sessions to determine each student's total speaking duration during class. By quantifying airtime in milliseconds, this study aims to provide a measurable indicator of student participation. This data will offer valuable insights to help educators refine engagement strategies and enhance the online
